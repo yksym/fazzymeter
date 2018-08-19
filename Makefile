@@ -37,6 +37,7 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Src/main.c \
+Src/loop.c \
 Src/stm32f4xx_it.c \
 Src/stm32f4xx_hal_msp.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
@@ -188,5 +189,7 @@ clean:
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
+
+-include test.mk
 
 # *** EOF ***
