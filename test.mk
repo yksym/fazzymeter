@@ -8,7 +8,7 @@ gdb-server:
 	openocd -f board/st_nucleo_f4.cfg
 
 gdb:
-	/usr/bin/arm-none-eabi-gdb  $(BUILD_DIR)/$(TARGET).hex
+	/usr/bin/arm-none-eabi-gdb  $(BUILD_DIR)/$(TARGET).elf
 
 .PHONY: flash read-tty gdb-server gdb
 
