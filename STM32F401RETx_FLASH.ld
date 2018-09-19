@@ -56,6 +56,15 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
+  .boot :
+  {
+    . = ALIGN(4);
+    *(.boot)           /* .text sections (code) */
+    *(.boot*)          /* .text* sections (code) */
+    . = ALIGN(4);
+    _eboot = .;        /* define a global symbols at end of code */
+  } >FLASH
+
   /* The program code and other data goes into FLASH */
   .text :
   {

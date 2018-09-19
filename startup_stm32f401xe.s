@@ -114,6 +114,15 @@ LoopFillZerobss:
   bx  lr    
 .size  Reset_Handler, .-Reset_Handler
 
+    .section  .boot.Reset_Handler2
+  .weak  Reset_Handler2
+  .type  Reset_Handler2, %function
+Reset_Handler2:  
+  ldr   sp, =_estack    		 /* set stack pointer */
+  movs  r1, #0
+  bl  main
+  bx  lr    
+.size  Reset_Handler2, .-Reset_Handler2
 /**
  * @brief  This is the code that gets called when the processor receives an 
  *         unexpected interrupt.  This simply enters an infinite loop, preserving
@@ -139,7 +148,7 @@ Infinite_Loop:
     
 g_pfnVectors:
   .word  _estack
-  .word  Reset_Handler
+  .word  Reset_Handler2
   .word  NMI_Handler
   .word  HardFault_Handler
   .word  MemManage_Handler
