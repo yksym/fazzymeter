@@ -95,6 +95,7 @@ fbo.use()
 fbo.clear(0.0, 0.0, 0.0, 0.0)
 
 ctx.clear(1.0, 1.0, 1.0)
+ctx.enable(moderngl.DEPTH_TEST)
 #vao.render(moderngl.LINES, 65 * 4)
 vao.render()
 
