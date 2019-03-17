@@ -91,6 +91,11 @@ color.value = (0.46, 0.67, 0.29)
 objects['grass'].render()
 
 myimg = Image.frombytes('RGBA', fbo.size, fbo.read(components=4), 'raw', 'RGBA', 0, -1)
-plt.imshow(myimg)
+print(myimg)
+png = Image.open("rose.png").convert('RGBA')
+print(png)
+alpha_composite = Image.alpha_composite(png, myimg)
+plt.imshow(alpha_composite)
 plt.show()
+#alpha_composite.save('foo.jpg', 'JPEG', quality=80)
 
