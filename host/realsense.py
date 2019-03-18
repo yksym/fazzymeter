@@ -52,7 +52,7 @@ def color_data(frames):
     return np.asanyarray(frames[0].get_data())
 
 
-def estimate_correction_quaternion(q, a, a0, gain = 0.05): # this doesn't correct yaw drift
+def estimate_correction_quaternion(q, a, a0): # this doesn't correct yaw drift
     a0_hat = q.rotate(a)
 
     la0_hat = np.linalg.norm(a0_hat, ord=2)
@@ -60,6 +60,9 @@ def estimate_correction_quaternion(q, a, a0, gain = 0.05): # this doesn't correc
 
     b = np.cross(a0_hat/la0_hat,a0/la0)
     theta = math.acos(np.dot(a0_hat, a0)/(la0_hat * la0))
+
+    gain = 0.5 * math.pow(2.2, -abs(la0_hat - la0))
+    #print(gain, la0_hat, la0)
 
     return Quaternion(axis=b, radians=theta * gain)
 
@@ -78,15 +81,16 @@ def main():
     #ax = fig.gca(projection='3d')
 
     #ax.view_init(elev=-90., azim=-90)
-    plot_frame(ax)
 
 
 
     p = init_camera()
 
-    q = Quaternion()
-    #x = np.zeros(3)
-    a0 = get_frame_data(p)[1]
+    q  = Quaternion()
+    q2 = Quaternion()
+    x = np.zeros(3)
+    v = np.zeros(3)
+    a0 = get_frame_data(p)[1] # 静止状態
 
     t = time.time()
 
@@ -105,9 +109,14 @@ def main():
             if c == 27 or c == ord('q'):
                 break
 
-            q = q + w * q / 2 * dt
-            dq = estimate_correction_quaternion(q, a, a0)
-            q = dq * q
+            qmodel = q + w * q / 2 * dt
+            dq = estimate_correction_quaternion(qmodel, a, a0)
+            q = dq * qmodel
+
+            amodel = q.rotate(a) # world座標系での加速度
+            b = amodel - a0
+            v = v + b * dt
+            x = x + v * dt
 
             ax.clear()
             ax.set_aspect('equal')
@@ -117,7 +126,14 @@ def main():
             ax.set_xlabel('x')
             ax.set_ylabel('y')
             ax.set_zlabel('z')
-            plot_frame(ax, R=q.rotation_matrix)
+            plot_frame(ax, R=q.rotation_matrix, t=x)
+
+            #ax.quiver(0, 0, 0, a0[0], a0[1], a0[2], color=(1,1,0), arrow_length_ratio=0)
+            #ax.quiver(0, 0, 0, a[0], a[1], a[2], color=(0,1,0), arrow_length_ratio=0)
+            #ax.quiver(0, 0, 0, a0_hat[0], a0_hat[1], a0_hat[2], color=(0,0,1), arrow_length_ratio=0)
+            #b = q.rotate(a)
+            #ax.quiver(0, 0, 0, b[0], b[1], b[2], color=(1,0,0), arrow_length_ratio=0)
+
             plt.pause(0.001)
             #print(q.rotation_matrix)
             #print( "acc: {:.2f} {:.2f} {:.2f} ".format(accel[0], accel[1], accel[2]), end="\r")
