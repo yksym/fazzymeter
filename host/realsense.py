@@ -83,20 +83,22 @@ def initGL():
 
 
 def render(ctx, prog, objects, fbo, q, x, img):
-    m = np.eye(4)
-    m[0:3,0:3] = q.rotation_matrix
-    #m[0:3, 3] = x
-    m = Matrix44(m)
-
+    print(q)
+    m = q.rotation_matrix
+    #q から 回転ベクトルだけ取り出して 変換かければ良さそう
+    eye = np.array([47.697, -8.147, 24.498])
+    eyedir = np.array([-47.7, 8.15, -16.5])
+    up = np.array([0.0, 0.0, 1.0])
     mvp = prog['Mvp']
     proj = Matrix44.perspective_projection(58.0, float(W) / H, 0.1, 1000.0)
     lookat = Matrix44.look_at(
-        (47.697, -8.147, 24.498), # eye
-        (0.0, 0.0, 8.0),          # target
-        (0.0, 0.0, 1.0),          # up(for side)
+        eye,
+        np.dot(m, eyedir) + eye,
+        np.dot(m, up),
     )
+    print(m)
 
-    mvp.write((proj * m * lookat).astype('f4').tobytes())
+    mvp.write((proj * lookat).astype('f4').tobytes())
 
     color = prog['Color']
     fbo.clear(0.0, 0.0, 0.0, 0.0)

@@ -36,21 +36,19 @@ fn main() -> ! {
 
     let DEV_ADDR = 0x68;//0xd0;
 
-    let mem_addr = [0x3b];
-    let mut buf: [u8; 14] = [0; 14];
-
-    //i2c.write(DEV_ADDR, &mem_addr).unwrap();
-    i2c.read(DEV_ADDR, &mut buf).unwrap();
-
     let mut stdout = match hio::hstdout() {
         Ok(fd)  => fd,
         Err(()) => panic!("cannot use stdout"),
     };
 
-    write!(stdout, "{:?}", buf).unwrap();
-
-    //hprintln!("Hello, world!").unwrap();
-
+    let mem_addr = 0x75;
+    let mut buf: [u8;1] = [0];
+    i2c.write(DEV_ADDR, &[0x6B, 0]);
+    loop {
+        let ret = i2c.write_read(DEV_ADDR, &[mem_addr], &mut buf);
+        write!(stdout, "{:?}", ret).unwrap();
+        write!(stdout, "{:?}", buf).unwrap();
+    }
     loop {
     }
 }
